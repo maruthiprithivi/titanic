@@ -47,7 +47,7 @@ change <- function(fileName)
       else NA # D
     })
 
-  column=names(x)
+  column = names(x)
 
   # loop through each column of the data frame
   for (i in 1:length(column))

@@ -10,7 +10,7 @@ change <- function(fileName)
   nameSplit = sapply(x["name"], function(y) {strsplit(y, "[,.] | [ ]")})
   x["lastName"] = sapply(nameSplit, function(y) {y[1]})
   x["title"] = sapply(nameSplit, function(y) {y[2]})
-  x["firstName"] = sapply(nameSplit, function(y) {y[3]})
+#  x["firstName"] = sapply(nameSplit, function(y) {y[3]})
 
   # split ticket into 2 columns and add them to the data frame as ticket1 (alpha-numeric) and ticket2
   ticketSplit = sapply(x["ticket"], function(y) {strsplit(gsub("[./]", "", y), " ")})
@@ -60,7 +60,7 @@ change <- function(fileName)
   # turn the columns below into factors
   if (fileName == "train")
     x["survived"] = factor(x[ , "survived"])
-  for (y in c("pclass", "sex", "embarked", "title", "ticket1", "cabinLetter"))
+  for (y in c("sex", "embarked", "title", "ticket1", "cabinLetter"))
     x[y] = factor(x[ , y])
 
   # remove name, ticket and cabin columns

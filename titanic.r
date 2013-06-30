@@ -1,28 +1,18 @@
 library("randomForest")
+source("change.r")
 
 formatData = function(fileName)
 {
-	input = read.csv(fileName, stringsAsFactors = F)
-
-    # change empty strings to NA
-    input$ticket  [which(input$ticket   == "")] = NA
-    input$cabin   [which(input$cabin    == "")] = NA
-    input$embarked[which(input$embarked == "")] = NA
-
-    # change categorical columns to factors
-    # test data don't have "survived"
-    if ("survived" %in% names(input))
-    {
-        input$survived = factor(input$survived)
-    }
-    input$pclass   = factor(input$pclass)
-    input$sex      = factor(input$sex)
-    input$embarked = factor(input$embarked)
+	input = change(sub(".csv", "", fileName))
 
     # drop unnecessary columns
-    input$name   = NULL
-    input$ticket = NULL
-    input$cabin  = NULL
+    input$lastName = NULL
+    input$title = NULL
+    input$firstName = NULL
+    input$ticket1 = NULL
+    input$ticket2 = NULL
+    input$cabinLetter = NULL
+    input$cabinNumber = NULL
 
 	return(input)
 }
@@ -49,7 +39,7 @@ fill = function(X, test, column)
 train = formatData("train.csv")
 test = formatData("test.csv")
 
-# X = rfImpute(train$survived ~ ., train)[, 2:ncol(train)] # fill missing values
+X = rfImpute(survived ~ ., train) # fill missing values
 
 # missRF = randomForest(train$survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
 # fillRF = randomForest(X, train$survived, ntree = 100, mtry = 3)

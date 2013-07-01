@@ -3,12 +3,11 @@ source("rawData.r")
 
 formatData = function(fileName)
 {
-	input = change(sub(".csv", "", fileName))
+	input = rawData(sub(".csv", "", fileName))
 
     # drop unnecessary columns
     input$lastName = NULL
     input$title = NULL
-    input$firstName = NULL
     input$ticket1 = NULL
     input$ticket2 = NULL
     input$cabinLetter = NULL

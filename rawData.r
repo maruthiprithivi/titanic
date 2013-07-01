@@ -1,4 +1,4 @@
-change <- function(fileName)
+rawData <- function(fileName)
 {
   if ((fileName %in% c("train", "test")) == 0)
     stop("invalid file name")

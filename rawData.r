@@ -12,6 +12,12 @@ rawData <- function(fileName)
   x["title"] = sapply(nameSplit, function(y) {y[2]})
 #  x["firstName"] = sapply(nameSplit, function(y) {y[3]})
 
+# Put "Mlle" and "Ms" into the group "Miss", "Mme" into the group "Mrs"
+  y = "title"
+  x["Mlle" == x[y] | "Ms" == x[y], ][y] = "Miss"
+  x["Mme" == x[y], ][y] = "Mrs"
+  rm(y)
+
   # split ticket into 2 columns and add them to the data frame as ticket1 (alpha-numeric) and ticket2
   ticketSplit = sapply(x["ticket"], function(y) {strsplit(gsub("[./]", "", y), " ")})
   x["ticket1"] = sapply(ticketSplit,
@@ -73,3 +79,6 @@ rawData <- function(fileName)
 
 
 }
+
+# c(10, 50, 292, 308, 547, 701, 782, 831, 856) Mrs
+# c(258, 505, 760) the Countess

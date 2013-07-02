@@ -10,15 +10,12 @@ rawData <- function(fileName)
   nameSplit = sapply(x["name"], function(y) {strsplit(y, "[,.] | [ ]")})
   x["lastName"] = sapply(nameSplit, function(y) {y[1]})
   x["title"] = sapply(nameSplit, function(y) {y[2]})
-  # x["firstName"] = sapply(nameSplit, function(y) {y[3]})
+#  x["firstName"] = sapply(nameSplit, function(y) {y[3]})
 
-  # Combine various title groups together
+  # Combine some titles together
   y = "title"
   x["Mlle" == x[y] | "Ms" == x[y], ][y] = "Miss"
   x["Mme" == x[y], ][y] = "Mrs"
-  x["Capt" == x[y] | "Col" == x[y] | "Major" == x[y], ][y] = "CapColMaj"
-  x["Don" == x[y] | "Jonkheer" == x[y] | "Sir" == x[y], ][y] = "DonJonSir"
-  x["Lady" == x[y] | "the Countess" == x[y], ][y] = "LadyCount"
   rm(y)
 
   # split ticket into 2 columns and add them to the data frame as ticket1 (alpha-numeric) and ticket2

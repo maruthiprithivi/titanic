@@ -10,12 +10,15 @@ rawData <- function(fileName)
   nameSplit = sapply(x["name"], function(y) {strsplit(y, "[,.] | [ ]")})
   x["lastName"] = sapply(nameSplit, function(y) {y[1]})
   x["title"] = sapply(nameSplit, function(y) {y[2]})
-#  x["firstName"] = sapply(nameSplit, function(y) {y[3]})
+  # x["firstName"] = sapply(nameSplit, function(y) {y[3]})
 
-# Put "Mlle" and "Ms" into the group "Miss", "Mme" into the group "Mrs"
+  # Combine various title groups together
   y = "title"
   x["Mlle" == x[y] | "Ms" == x[y], ][y] = "Miss"
   x["Mme" == x[y], ][y] = "Mrs"
+  x["Capt" == x[y] | "Col" == x[y] | "Major" == x[y], ][y] = "CapColMaj"
+  x["Don" == x[y] | "Jonkheer" == x[y] | "Sir" == x[y], ][y] = "DonJonSir"
+  x["Lady" == x[y] | "the Countess" == x[y], ][y] = "LadyCount"
   rm(y)
 
   # split ticket into 2 columns and add them to the data frame as ticket1 (alpha-numeric) and ticket2
@@ -70,7 +73,7 @@ rawData <- function(fileName)
     x[y] = factor(x[ , y])
 
   # remove name, ticket and cabin columns
-  x = x[!(column %in% c("name", "ticket", "cabin"))]
+  x = x[!(column %in% c("name", "ticket"))]
 
 
 
@@ -81,4 +84,6 @@ rawData <- function(fileName)
 }
 
 # c(10, 50, 292, 308, 547, 701, 782, 831, 856) Mrs
-# c(258, 505, 760) the Countess
+# c(310, 557, 600) Lady and Sir ticket1
+# c(258, 505, 760) Countess
+# c(53, 597, 646, 682, 721, 849) Rev Harper

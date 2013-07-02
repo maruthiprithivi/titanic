@@ -12,6 +12,7 @@ formatData = function(fileName)
     input$ticket2 = NULL
     input$cabinLetter = NULL
     input$cabinNumber = NULL
+    input$cabin = NULL
 
 	return(input)
 }

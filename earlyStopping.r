@@ -1,10 +1,14 @@
+## Script to study early stopping by running random forest many times.
+## Plot histograms for minimum OOB error, index corresponding to minimum,
+## and validation curve for d (number of variables to try at each split).
+
 stopEarly = function(X, d, n = 100)
 {
     err = matrix(nrow = n, ncol = 2, dimnames = list(NULL, c("index", "value")))
 
     for (i in 1:n)
     {
-        RF = randomForest(survived ~ ., X, ntree = 2000, mtry = d)
+        RF = randomForest(survived ~ ., X, ntree = 8000, mtry = d)
 
         err[i, "index"] = which.min(RF$err.rate[, "OOB"])
         err[i, "value"] = min(RF$err.rate[, "OOB"])

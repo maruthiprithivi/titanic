@@ -18,9 +18,7 @@ formatData = function(fileName)
 
 trainRF = function(X, d, n = 200)
 {
-    # Xfill = rfImpute(X, y, ntree = n, mtry = d)
-    # Xfill$y = NULL
-    RF = randomForest(X$survived ~ ., X, ntree = n, mtry = d, na.action = na.omit)
+    RF = randomForest(survived ~ ., X, ntree = n, mtry = d, na.action = na.omit)
     CM = RF$confusion[, 1:2]
     err = 1 - sum(diag(CM)) / sum(CM)
 }
@@ -40,8 +38,8 @@ test = formatData("test.csv")
 
 X = rfImpute(survived ~ ., train) # fill missing values
 
-# missRF = randomForest(train$survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
-# fillRF = randomForest(X, train$survived, ntree = 100, mtry = 3)
+# missRF = randomForest(survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
+# fillRF = randomForest(survived ~ ., X, ntree = 100, mtry = 3)
 
 # convergence curve
 # X1 = Xfill[1:594, ]

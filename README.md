@@ -21,3 +21,5 @@ I improved by calling
 to fill the missing values before training the classifier. All other parameters remained the same.
 
 My score increased to 76.1%
+
+July 3 - Obtained a score of 0.78947 by testing a random forest with 200 trees and 3 variables randomly chosen at each node, i.e. _d_ is 3. Used 9 predictors (pclass, gender, age, sibsp, parch, fare, embarked, title and ticket2). Computed the mean and median of the available age values of the passengers with the title "Master". Took the average of this mean and median to replace the missing age values of the other passengers with the title "Master". Repeated this for each title "Miss", "Mr" and "Mrs". The missing values of the other variables (fare, embarked and ticket2) were completed by rfImpute.

@@ -2,13 +2,13 @@
 ## Plot histograms for minimum OOB error, index corresponding to minimum,
 ## and validation curve for d (number of variables to try at each split).
 
-stopEarly = function(X, d, n = 100)
+stopEarly = function(X, d, tree = 2000, iter = 100)
 {
-    err = matrix(nrow = n, ncol = 2, dimnames = list(NULL, c("index", "value")))
+    err = matrix(nrow = iter, ncol = 2, dimnames = list(NULL, c("index", "value")))
 
-    for (i in 1:n)
+    for (i in 1:iter)
     {
-        RF = randomForest(survived ~ ., X, ntree = 2000, mtry = d)
+        RF = randomForest(survived ~ ., X, ntree = tree, mtry = d)
 
         err[i, "index"] = which.min(RF$err.rate[, "OOB"])
         err[i, "value"] = min(RF$err.rate[, "OOB"])
@@ -19,10 +19,15 @@ stopEarly = function(X, d, n = 100)
 
 plotError = function(err, name)
 {
-    windows()
-    par(mfrow = c(3, 3))
+    nVar = length(err)
+    nSqr = sqrt(nVar)
+    nCol = ceiling(nSqr)
+    nRow = round(nSqr)
 
-    for (d in 1:length(err))
+    windows(nCol * 300, nRow *300)
+    par(mfrow = c(nRow, nCol))
+
+    for (d in 1:nVar)
     {
         x = err[[d]][, name]
         hist(x, main = paste("d =", d), xlab = name)
@@ -33,10 +38,11 @@ plotError = function(err, name)
     savePlot(paste("figures/min error", name), "png")
 }
 
-early stopping
-err = lapply(2:ncol(X) - 1, function(d) { stopEarly(X, d) })
-save(err, file = "OOBerrors.RData")
-# load("OOBerrors.RData")
+# set.seed(0)
+# X = rfImpute(survived ~ ., train) # fill missing values
+# err = lapply(2:ncol(X) - 1, function(d) { stopEarly(X, d) })
+# save(err, file = "data/OOBerrors.RData")
+load("data/OOBerrors.RData")
 plotError(err, "index")
 plotError(err, "value")
 windows()

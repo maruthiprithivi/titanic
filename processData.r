@@ -1,6 +1,6 @@
 ## Functions to read and process data.
 
-rawData <- function(fileName)
+rawData = function(fileName)
 {
     if ((fileName %in% c("train", "test")) == 0)
         stop("invalid file name")
@@ -15,39 +15,42 @@ rawData <- function(fileName)
     x["firstName"] = sapply(nameSplit, function(y) {y[3]})
 
     # split ticket into 2 columns and add them to the data frame as ticket1 (alpha-numeric) and ticket2
-    ticketSplit = sapply(x["ticket"], function(y) {strsplit(gsub("[./]", "", y), " ")})
+    ticketSplit = sapply(x["ticket"],
+        function(y) {strsplit(gsub("[./]", "", y), " ")})
     x["ticket1"] = sapply(ticketSplit,
-    function(y)
-    {
-        if (length(y) > 2) paste(y[1], y[2], sep = "") # STON/O 2.
-        else if (substr(y[1], 1, 1) %in% LETTERS) y[1]
-        else ""
-    })
+        function(y)
+        {
+            if (length(y) > 2) paste(y[1], y[2], sep = "") # STON/O 2.
+            else if (substr(y[1], 1, 1) %in% LETTERS) y[1]
+            else ""
+        })
     x["ticket2"] = sapply(ticketSplit,
-    function(y)
-    {
-        if (length(y) > 2) as.integer(y[3]) # STON/O 2. 3101294
-        else if (length(y) > 1) as.integer(y[2])
-        else if (substr(y[1], 1, 1) %in% LETTERS) NA # LINE
-        else as.integer(y[1])
-    })
+        function(y)
+        {
+            if (length(y) > 2) as.integer(y[3]) # STON/O 2. 3101294
+            else if (length(y) > 1) as.integer(y[2])
+            else if (substr(y[1], 1, 1) %in% LETTERS) NA # LINE
+            else as.integer(y[1])
+        })
 
     # split cabin into 2 columns and add them to the data frame as cabinLetter and cabinNumber
     cabinSplit = sapply(x["cabin"], function(y) {strsplit(y, " ")})
     x["cabinLetter"] = sapply(cabinSplit,
-    function(y)
-    {
-        if (length(y) > 1) substring(y[2], 1, 1) # C23 C25 C27 or F G73
-        else if (length(y) == 1) substring(y[1], 1, 1)
-        else ""
-    })
+        function(y)
+        {
+            if (length(y) > 1) substring(y[2], 1, 1) # C23 C25 C27 or F G73
+            else if (length(y) == 1) substring(y[1], 1, 1)
+            else ""
+        })
     x["cabinNumber"] = sapply(cabinSplit,
-    function(y)
-    {
-        if (length(y) > 1) as.integer(substring(y[2], 2, 4)) # C23 C25 C27 or F G73
-        else if (length(y) == 1) as.integer(substring(y[1], 2, 4)) # C85, C123, G6
-        else NA # D
-    })
+        function(y)
+        {
+            if (length(y) > 1) # C23 C25 C27 or F G73
+                as.integer(substring(y[2], 2, 4))
+            else if (length(y) == 1) # C85 or C123 or G6
+                as.integer(substring(y[1], 2, 4))
+            else NA # D
+        })
 
     # replace all "" entries for every columns with NA
     for (i in 1:ncol(x)) x[x[, i] %in% "", i] = NA
@@ -75,9 +78,11 @@ refineData = function(x)
 
     # turn the columns below into factors
     if ("survived" %in% column) # training data set
+    {
         x["survived"] = factor(x[ , "survived"])
+    }
     for (y in c("sex", "embarked", "title", "ticket1", "cabinLetter"))
-    x[y] = factor(x[ , y])
+        x[y] = factor(x[ , y])
 
     # remove unnecessary columns
     x = x[!(column %in% c("name", "ticket", "firstName"))]

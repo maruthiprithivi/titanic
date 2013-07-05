@@ -77,3 +77,5 @@ test = formatData("test.csv")
 
 # write(as.vector(p1), "prediction1.csv", 1)
 # write(as.vector(p2), "prediction2.csv", 1)
+
+# write.csv(data.frame(PassengerId = 1:418, Survived = p) , "./prediction.csv", row.names = F)

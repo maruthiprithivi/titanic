@@ -1,5 +1,5 @@
 library("randomForest")
-source("rawData.r")
+source("processData.r")
 
 formatData = function(fileName)
 {

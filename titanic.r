@@ -17,30 +17,13 @@ formatData = function(fileName)
 	return(input)
 }
 
-trainRF = function(X, d, n = 200)
-{
-    RF = randomForest(survived ~ ., X, ntree = n, mtry = d, na.action = na.omit)
-    CM = RF$confusion[, 1:2]
-    err = 1 - sum(diag(CM)) / sum(CM)
-}
-
-# fill test missing values by regression
-fill = function(X, test, column)
-{
-	regRF = randomForest(X[, column] ~ ., X, na.action = na.omit)
-	na.i = which(is.na(test[column]))
-	rows = test[na.i, ]
-	rows[column] = NULL
-	test[na.i, column] = predict(regRF, rows)
-}
-
 train = formatData("train.csv")
 test = formatData("test.csv")
 
-# X = rfImpute(survived ~ ., train) # fill missing values
-
-# missRF = randomForest(survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
-# fillRF = randomForest(survived ~ ., X, ntree = 100, mtry = 3)
+X = rfImpute(survived ~ ., train) # fill missing values
+RF = randomForest(survived ~ ., X, ntree = 8000)
+plot(RF$err.rate[, "OOB"])
+savePlot("figures/OOB error vs Index", "png")
 
 # convergence curve
 # X1 = Xfill[1:594, ]
@@ -50,27 +33,8 @@ test = formatData("test.csv")
 # forest = randomForest(X1, y1, X2, y2, ntree = 8000)
 # plot($err.rate[, 'OOB'])
 
-# validation curve
-# plot(sapply(1:ncol(X), function(d) { trainRF(train, d) }), type = 'l')
-
-# fill missing test values
-# Xage = Xfill
-# Xage$age = NULL
-# ageRF = randomForest(Xage, Xfill$age)
-
-# fill missing test values by rfImpute
-# X0 = na.roughfix(test)
-# y0 = predict(forest, X0)
-
-# while (T)
-# {
-	# X1 = rfImpute(test, y0, iter = 1)
-	# y1 = predict(forest, X1)
-
-	# if (sum(y1 != y0) == 0) break
-
-	# y0 = y1
-# }
+# missRF = randomForest(survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
+# fillRF = randomForest(survived ~ ., X, ntree = 100, mtry = 3)
 
 # p1 = predict(missRF, X0)
 # p2 = predict(fillRF, X0)

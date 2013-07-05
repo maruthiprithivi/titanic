@@ -23,3 +23,5 @@ classifier = function(bestT = 2000, best.d = 4)
 # source("titanic.r")
 # p = predict(classifier(), na.roughfix(test))
 # write(as.vector(p), "prediction.csv", 1)
+
+# write.csv(data.frame(PassengerId = 1:418, Survived = p) , "./prediction.csv", row.names = F)

@@ -8,7 +8,7 @@ stopEarly = function(X, d, n = 100)
 
     for (i in 1:n)
     {
-        RF = randomForest(survived ~ ., X, ntree = 8000, mtry = d)
+        RF = randomForest(survived ~ ., X, ntree = 2000, mtry = d)
 
         err[i, "index"] = which.min(RF$err.rate[, "OOB"])
         err[i, "value"] = min(RF$err.rate[, "OOB"])
@@ -33,9 +33,10 @@ plotError = function(err, name)
     savePlot(paste("figures/min error", name), "png")
 }
 
-# early stopping
+early stopping
 err = lapply(2:ncol(X) - 1, function(d) { stopEarly(X, d) })
 save(err, file = "OOBerrors.RData")
+# load("OOBerrors.RData")
 plotError(err, "index")
 plotError(err, "value")
 windows()

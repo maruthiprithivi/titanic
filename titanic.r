@@ -3,14 +3,14 @@ source("rawData.r")
 
 formatData = function(fileName)
 {
-	input = rawData(sub(".csv", "", fileName))
+	input = refineData(rawData(sub(".csv", "", fileName)))
 
     # drop unnecessary columns
     input$lastName = NULL
-    input$title = NULL
+    # input$title = NULL
     input$ticket1 = NULL
-    input$ticket2 = NULL
-    input$cabinLetter = NULL
+    # input$ticket2 = NULL
+    # input$cabinLetter = NULL
     input$cabinNumber = NULL
     input$cabin = NULL
 
@@ -37,7 +37,7 @@ fill = function(X, test, column)
 train = formatData("train.csv")
 test = formatData("test.csv")
 
-X = rfImpute(survived ~ ., train) # fill missing values
+# X = rfImpute(survived ~ ., train) # fill missing values
 
 # missRF = randomForest(survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
 # fillRF = randomForest(survived ~ ., X, ntree = 100, mtry = 3)

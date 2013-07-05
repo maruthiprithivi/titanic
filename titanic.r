@@ -21,17 +21,17 @@ train = formatData("train.csv")
 test = formatData("test.csv")
 
 X = rfImpute(survived ~ ., train) # fill missing values
-RF = randomForest(survived ~ ., X, ntree = 8000)
-plot(RF$err.rate[, "OOB"])
-savePlot("figures/OOB error vs Index", "png")
+# RF = randomForest(survived ~ ., X, ntree = 8000)
+# plot(RF$err.rate[, "OOB"])
+# savePlot("figures/OOB error vs Index", "png")
 
 # convergence curve
-# X1 = Xfill[1:594, ]
-# y1 = y[1:594]
-# X2 = Xfill[595:891, ]
-# y2 = y[595:891]
-# forest = randomForest(X1, y1, X2, y2, ntree = 8000)
-# plot($err.rate[, 'OOB'])
+# X1 = X[1:594, 2:ncol(X)]
+# y1 = X[1:594, 1]
+# X2 = X[595:891, 2:ncol(X)]
+# y2 = X[595:891, 1]
+# RF = randomForest(X1, y1, X2, y2, ntree = 8000)
+# plot(RF$err.rate[, 'OOB'])
 
 # missRF = randomForest(survived ~ ., train, ntree = 100, mtry = 3, na.action = na.omit)
 # fillRF = randomForest(survived ~ ., X, ntree = 100, mtry = 3)

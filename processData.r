@@ -55,6 +55,9 @@ rawData = function(fileName)
     # replace all "" entries for every columns with NA
     for (i in 1:ncol(x)) x[x[, i] %in% "", i] = NA
 
+    # factor response column "survived" in training data set
+    x[names(x) %in% "survived"] = factor(x$survived)
+
     return(x)
 }
 
@@ -68,24 +71,18 @@ refineData = function(x)
     ranks = c("Capt", "Col", "Major")
     x$title[x$title %in% ranks] = "Offr"
 
-    royal = c( "Don", "Dona", "Jonkheer", "Lady", "Sir", "the Countess")
+    royal = c("Don", "Dona", "Jonkheer", "Lady", "Sir", "the Countess")
     x$title[x$title %in% royal] = "Royal"
 
     # change unrealistic cabin letter to NA
     x$cabinLetter["T" == x$cabinLetter] = NA
 
-    column = names(x)
-
     # turn the columns below into factors
-    if ("survived" %in% column) # training data set
-    {
-        x["survived"] = factor(x[ , "survived"])
-    }
     for (y in c("sex", "embarked", "title", "ticket1", "cabinLetter"))
         x[y] = factor(x[ , y])
 
     # remove unnecessary columns
-    x = x[!(column %in% c("name", "ticket", "firstName"))]
+    x = x[!(names(x) %in% c("name", "ticket", "firstName"))]
 
     return(x)
 }

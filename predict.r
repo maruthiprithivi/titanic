@@ -40,7 +40,7 @@ p = predictRF(train, test)
 write.csv(data.frame(PassengerId = 1:nrow(test), Survived = p),
           "prediction.csv", row.names = F)
 
-# create a matrix of predictions to look at error prediction
+# create a matrix of predictions to look at their errors
 # x is the training set, y is the test set and n is the number of predictions
 preMat <- function(x, y, n)
 {
@@ -51,6 +51,8 @@ preMat <- function(x, y, n)
         p = predict(xRf, y)
         pM[i, ] = as.integer(levels(p))[p]
     }
+
+#   colMeans(pM)
 
     return(pM)
 

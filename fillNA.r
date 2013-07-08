@@ -28,7 +28,7 @@ ageNA <- function(x)
 	t = "title"
 	for (y in c("Master", "Miss", "Mr", "Mrs"))
 		x[is.na(x[a]) & y == x[t], ][a] = 0.5 * (colMeans(x[y == x[t], ][a], na.rm = T) + median(x[y == x[t],a], na.rm = T))
-	if (sum(is.na(x["age"]) & "Dr" == x["title"]) > 0)
+	if (sum(is.na(x[a]) & "Dr" == x[t]) > 0)
 		x[is.na(x[a]) & "Dr" == x[t], ][a] = 0.5 * (colMeans(x["Dr" == x[t], ][a], na.rm = T) + median(x["Dr" == x[t],a], na.rm = T))
 	rm(a, t)
 

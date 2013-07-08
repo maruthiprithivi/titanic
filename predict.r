@@ -1,27 +1,41 @@
 ## Train a random forest with early stopping.
 ## Write out its prediction on a test set.
 
-classifier = function(bestT = 2000, best.d = 4)
+source("fillNA.r")
+
+classifier = function(X, bestT = 2000, best.d = 4)
 {
-    X = rfImpute(survived ~ ., train) # fill missing values
-    seed = .Random.seed[3]
+    seed = .Random.seed[3] # between -2^31 and 2^31
     set.seed(seed)
     RF0 = randomForest(survived ~ ., X, ntree = bestT, mtry = best.d)
     i.min = which.min(RF0$err.rate[, "OOB"])
     set.seed(seed)
     RFm = randomForest(survived ~ ., X, ntree = i.min, mtry = best.d)
 
-    if (which.min(RFm$err.rate[, "OOB"]) != i.min) # sanity check
-        print("Minimum index has changed!")
+    # if (which.min(RFm$err.rate[, "OOB"]) != i.min) # sanity check
+        # print("Minimum index has changed!")
 
-    plot(RF0$err.rate[, "OOB"])
-    lines(RFm$err.rate[, "OOB"], col = "red")
+    # plot(RF0$err.rate[, "OOB"])
+    # lines(RFm$err.rate[, "OOB"], col = "red")
 
-    return(RFm)
+    # return(RFm)
 }
 
-# source("titanic.r")
-# p = predict(classifier(), na.roughfix(test))
-# write(as.vector(p), "prediction.csv", 1)
+# fill test missing values by assuming all test examples belong to one class
+# find prob(survived = 0) and prob(survived = 1) for each class assumption
+# sum probabilities over the class assumptions to give a weight for
+# survived = 0 and for survived = 1
+# prediction is given by the value of survived with the max weight
+predictRF = function(train, test, ...)
+{
+    X = rfImpute(survived ~ ., train)
+    RF = classifier(X, ...)
+    p0 = predict(RF, fillByAssumption(X, test, 0), "prob")
+    p1 = predict(RF, fillByAssumption(X, test, 1), "prob")
 
-# write.csv(data.frame(PassengerId = 1:418, Survived = p) , "./prediction.csv", row.names = F)
+    as.integer(levels(X$survived)[max.col(p0 + p1)])
+}
+
+p = predictRF(train, test)
+write.csv(data.frame(PassengerId = 1:nrow(test), Survived = p),
+          "prediction.csv", row.names = F)

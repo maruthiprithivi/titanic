@@ -8,8 +8,8 @@ formatData = function(fileName)
     # drop unnecessary columns
     input$lastName = NULL
     # input$title = NULL
-    input$ticket1 = NULL
-    # input$ticket2 = NULL
+    input$ticketHeader = NULL
+    # input$ticketNumber = NULL
     # input$cabinLetter = NULL
     input$cabinNumber = NULL
     input$cabin = NULL

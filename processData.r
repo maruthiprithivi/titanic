@@ -78,8 +78,12 @@ refineData = function(x)
     x$cabinLetter["T" == x$cabinLetter] = NA
 
     # turn the columns below into factors
-    for (y in c("sex", "embarked", "title", "ticket1", "cabinLetter"))
+    for (y in c("pclass", "sex", "embarked", "title", "ticket1", "cabinLetter"))
         x[y] = factor(x[ , y])
+
+    # add order for these factors
+    for (y in c("pclass", "cabinLetter"))
+        x[y] = ordered(x[ , y])
 
     # remove unnecessary columns
     x = x[!(names(x) %in% c("name", "ticket", "firstName"))]

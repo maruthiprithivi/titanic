@@ -36,24 +36,18 @@ predictRF = function(train, test, ...)
     as.integer(levels(X$survived)[max.col(p0 + p1)])
 }
 
-p = predictRF(train, test)
-write.csv(data.frame(PassengerId = 1:nrow(test), Survived = p),
-          "prediction.csv", row.names = F)
-
 # create a matrix of predictions to look at their errors
-# x is the training set, y is the test set and n is the number of predictions
-preMat <- function(x, y, n)
+predMatrix <- function(train, test, nPred)
 {
-    pM = matrix(nrow = n, ncol = nrow(y))
-    for (i in 1 : n)
-    {
-        xRf = classifier(x)
-        p = predict(xRf, y)
-        pM[i, ] = as.integer(levels(p))[p]
-    }
+    pM = matrix(nrow = nPred, ncol = nrow(test))
+
+    for (i in 1 : nPred) pM[i, ] = predictRF(train, test)
 
 #   colMeans(pM)
 
     return(pM)
-
 }
+
+# p = predictRF(train, test)
+# write.csv(data.frame(PassengerId = 1:nrow(test), Survived = p),
+          # "prediction.csv", row.names = F)

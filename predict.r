@@ -48,15 +48,23 @@ predMatrix <- function(train, test, nPred)
     return(pM)
 }
 
-# compute mode of each column in a matrix x
-colMode <- function(x)
+# compute row (margin = 1) or column (margin = 2) mode of a matrix x
+statsMode <- function(x, margin)
 {
-    apply(x, 2,
+    apply(x, margin,
         function(y)
         {
             tab = table(y)
             as.integer(names(tab)[which.max(tab)])
         })
+}
+
+# compute mean of the difference of each prediction with the prediction mode
+avgDifFromMode <- function(x)
+{
+    ref = statsMode(x, 2)
+    avgDif = apply(x, 1, function(y) {mean(ref != y)})
+    return(avgDif)
 }
 
 # p = predictRF(train, test)

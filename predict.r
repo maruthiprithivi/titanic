@@ -36,7 +36,7 @@ predictRF = function(train, test, ...)
     as.integer(levels(X$survived)[max.col(p0 + p1)])
 }
 
-# create a matrix of predictions to look at their errors
+# generate predictions to look at their statistics
 predMatrix <- function(train, test, nPred)
 {
     pM = matrix(nrow = nPred, ncol = nrow(test))
@@ -46,6 +46,17 @@ predMatrix <- function(train, test, nPred)
 #   colMeans(pM)
 
     return(pM)
+}
+
+# compute mode of each column in a matrix x
+colMode <- function(x)
+{
+    apply(x, 2,
+        function(y)
+        {
+            tab = table(y)
+            as.integer(names(tab)[which.max(tab)])
+        })
 }
 
 # p = predictRF(train, test)

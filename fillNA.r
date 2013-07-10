@@ -26,11 +26,11 @@ ageNA <- function(x)
 {
 	a = "age"
 	t = "title"
+	ageMissing = is.na(x[a])
 	for (y in c("Master", "Miss", "Mr", "Mrs"))
-		x[is.na(x[a]) & y == x[t], ][a] = 0.5 * (colMeans(x[y == x[t], ][a], na.rm = T) + median(x[y == x[t],a], na.rm = T))
-	if (sum(is.na(x[a]) & "Dr" == x[t]) > 0)
-		x[is.na(x[a]) & "Dr" == x[t], ][a] = 0.5 * (colMeans(x["Dr" == x[t], ][a], na.rm = T) + median(x["Dr" == x[t],a], na.rm = T))
-	rm(a, t)
+		x[ageMissing & y == x[t], ][a] = 0.5 * (colMeans(x[y == x[t], ][a], na.rm = T) + median(x[y == x[t],a], na.rm = T))
+	if (sum(ageMissing & "Dr" == x[t]) > 0)
+		x[ageMissing & "Dr" == x[t], ][a] = 0.5 * (colMeans(x["Dr" == x[t], ][a], na.rm = T) + median(x["Dr" == x[t],a], na.rm = T))
 
 	return(x)
 

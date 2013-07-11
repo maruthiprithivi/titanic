@@ -88,8 +88,8 @@ avgDifSample <- function(x, progress)
 }
 
 # compute 3 vectors to guage uncertainty of the list x created by the function avgDifSample
-# the 1st vector is a the means of the average differences
-# the 2nd vector is a the sd's of the average differences
+# the 1st vector is the means of the average differences
+# the 2nd vector is the sd's of the average differences
 # the 3rd vector is a number which is the sd of the means of the average differences
 uncertain <- function(x)
 {

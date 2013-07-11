@@ -48,7 +48,8 @@ predMatrix <- function(train, test, nPred)
     return(pM)
 }
 
-# compute row (margin = 1) or column (margin = 2) mode of a matrix x
+# compute row (margin = 1) or column (margin = 2) mode of a matrix x of integers
+# to use for characters, remove as.integer
 statsMode <- function(x, margin)
 {
     apply(x, margin,
@@ -57,14 +58,48 @@ statsMode <- function(x, margin)
             tab = table(y)
             as.integer(names(tab)[which.max(tab)])
         })
+
 }
 
 # compute mean of the difference of each prediction with the prediction mode
+# x is a matrix of predictions
 avgDifFromMode <- function(x)
 {
     ref = statsMode(x, 2)
     avgDif = apply(x, 1, function(y) {mean(ref != y)})
+    
     return(avgDif)
+
+}
+
+# randomly sample increasing sub-matrices of predictions from a matrix x of predictions 
+# call the function avgDifFromMode on each of these sub-matrics
+# store the average differences in a list
+# progress is the increase size
+avgDifSample <- function(x, progress)
+{
+    avgDifSamList = vector("list")
+    rowMat = nrow(x)
+    for (i in 1 : (rowMat / progress))
+        avgDifSamList[[i]] = avgDifFromMode(x[sample(1 : rowMat, i * progress, replace = F), ])
+
+    return(avgDifSamList)
+
+}
+
+# compute 3 vectors to guage uncertainty of the list x created by the function avgDifSample
+# the 1st vector is a the means of the average differences
+# the 2nd vector is a the sd's of the average differences
+# the 3rd vector is a number which is the sd of the means of the average differences
+uncertain <- function(x)
+{
+    valid = vector("list")
+    valid[[1]] = sapply(x, mean)
+    valid[[2]] = sapply(x, sd)
+    valid[[3]] = sd(valid[[1]])
+
+    return(valid)
+
 }
 
 # p = predictRF(train, test)

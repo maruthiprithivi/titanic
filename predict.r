@@ -91,7 +91,7 @@ avgDifSample <- function(x, progress)
 # the 1st vector is the means of the average differences
 # the 2nd vector is the sd's of the average differences
 # the 3rd vector is a number which is the sd of the means of the average differences
-uncertain <- function(x)
+uncertainty <- function(x)
 {
     valid = vector("list")
     valid[[1]] = sapply(x, mean)

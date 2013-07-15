@@ -62,7 +62,7 @@ rawData = function(fileName)
 
 refineData = function(x)
 {
-    # combine certain titles together
+    # combine certain titles
     x$title["Mlle" == x$title] = "Miss"
     x$title["Ms"   == x$title] = "Miss"
     x$title["Mme"  == x$title] = "Mrs"
@@ -75,6 +75,18 @@ refineData = function(x)
 
     # change unrealistic cabin letter to NA
     x$cabinLetter["T" == x$cabinLetter] = NA
+
+    # combine certain ticketHeaders
+    y = "ticketHeader"
+    z = x[y][[1]]
+    x[z %in% c("A2", "A4", "A5", "AQ3", "AQ4", "AS"), ][y] = "A"
+    x[z %in% c("C", "CA", "CASOTON"), ][y] = "C"
+    x[z %in% c("Fa", "FC", "FCC"), ][y] = "F"
+    x[z %in% c("PC", "PP", "PPP"), ][y] = "P"
+    x[z %in% c("SOTONO2", "SOTONOQ", "STONO2", "STONOQ"), ][y] = "SOTON"
+    x[which("SCParis" == x[y]), ][y] = "SCPARIS"
+    x[z %in% c("SC", "SCA3", "SCA4", "SCAH", "SCAHBasle", "SCOW", "SOC", "SOP", "SOPP", "SP", "SWPP"), ][y] = "S"
+    x[z %in% c("WC", "WEP"), ][y] = "W"
 
     # turn certain columns into factors
     for (y in c("pclass", "sex", "embarked", "title", "ticketHeader", "cabinLetter"))
@@ -90,7 +102,6 @@ refineData = function(x)
     return(x)
 }
 
-# levels(test$title) = c(levels(test$title), "Capt", "Don", "Jonkheer", "Lady", "Major", "Mme", "Sir", "the Countess")
 # c(10, 50, 292, 308, 547, 701, 782, 831, 856) Mrs
 # c(310, 557, 600) Lady and Sir ticket1
 # c(258, 505, 760) Countess

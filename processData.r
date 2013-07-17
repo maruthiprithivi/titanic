@@ -89,9 +89,9 @@ refineData = function(x)
     x[z %in% c("WC", "WEP"), ][y] = "W"
 
     # turn certain columns into factors
-    for (y in c("pclass", "sex", "embarked", "title", "ticketHeader", "cabinLetter"))
+    x[y] = factor(x[ , y], levels = c("A", "C", "F", "LINE", "LP", "P", "S", "SCPARIS", "SOTON", "W"))
+    for (y in c("pclass", "sex", "embarked", "title", "cabinLetter"))
         x[y] = factor(x[ , y])
-
     # add order for these factors
     for (y in c("pclass", "cabinLetter"))
         x[y] = ordered(x[ , y])

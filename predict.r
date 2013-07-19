@@ -43,8 +43,6 @@ predMatrix <- function(train, test, nPred)
 
     for (i in 1 : nPred) pM[i, ] = predictRF(train, test)
 
-#   colMeans(pM)
-
     return(pM)
 }
 
@@ -87,7 +85,7 @@ avgDifSample <- function(x, progress)
 
 }
 
-# compute 3 vectors to guage uncertainty of the list x created by the function avgDifSample
+# compute 3 vectors to gauge uncertainty of the list x created by the function avgDifSample
 # the 1st vector is the means of the average differences
 # the 2nd vector is the sd's of the average differences
 # the 3rd vector is a number which is the sd of the means of the average differences
@@ -100,6 +98,59 @@ uncertainty <- function(x)
 
     return(valid)
 
+}
+
+# study the uncertainty from test predictions
+# pred is a matrix with nrow of predictions and ncol examples in test set
+# use the mode of predictions as a reference for determining accuracy
+# select a random subset of the test examples
+# flip their values in mode prediction to reduce the mean accuracy of predictions
+# increase size of random subset in steps of 1% (accuracy drops by 1%)
+# find the uncertainty as a function of the accuracy
+uncertaintyTest = function(pred, nPoint)
+{
+    n = ncol(pred) # size of test set
+    x = vector("numeric", nPoint) # means of accuracy
+    y = vector("numeric", nPoint) # std dev of accuracy
+    modePred = statsMode(pred, 2) # find modes by column
+
+    for (i in 1:nPoint)
+    {
+        v = modePred
+        s = sample(n, round(i / 100 * n))
+        v[s] = !modePred[s]
+        acc = apply(pred, 1, function(r) { mean(r == v) })
+        x[i] = mean(acc)
+        y[i] = sd(acc)
+    }
+
+    plot(x, y, xlab = "accuracy", ylab = "uncertainty")
+    cbind(x, y)
+}
+
+# study on the uncertainty by validation
+# split data set to training and validation
+# get classifier from training and predict on validation set
+# find standard deviation of 100 such predictions
+uncertaintyValid = function(input, validSize, nExpt)
+{
+    TV = trainAndValidSets(input, validSize)
+    acc = vector()
+
+    for (i in 1:nExpt)
+    {
+        X1 = rfImpute(survived ~ ., TV[["train"]])
+        X2 = rfImpute(survived ~ ., TV[["valid"]])
+        p = predict(classifier(X1), X2)
+        acc[i] = mean(p == X2$survived)
+    }
+
+    hist(acc, main = "", xlab = "accuracy")
+    title(paste("Validation accuracies (sd =", signif(sd(acc), 2), ")"))
+    abline(v = median(acc), col = "red")
+    abline(v = mean(acc), col = "blue")
+
+    return(acc)
 }
 
 # p = predictRF(train, test)

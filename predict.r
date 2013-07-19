@@ -43,8 +43,6 @@ predMatrix <- function(train, test, nPred)
 
     for (i in 1 : nPred) pM[i, ] = predictRF(train, test)
 
-#   colMeans(pM)
-
     return(pM)
 }
 
@@ -72,6 +70,25 @@ avgDifFromMode <- function(x)
 
 }
 
+# study the uncertainty as a function of the accuracy
+uncertaintyVsAccuracy = function(pred)
+{
+    x = vector() # means of accuracy
+    y = vector() # std dev of accuracy
+
+    for (i in 1:10)
+    {
+        n = ncol(pred)
+        v = rep(0, n)
+        v[sample(n, round(i / 10 * n))] = 1
+        acc = apply(pred, 1, function(r) { mean(r == v) })
+        x[i] = mean(acc)
+        y[i] = sd(acc)
+    }
+
+    plot(x, y)
+}
+
 # randomly sample increasing sub-matrices of predictions from a matrix x of predictions 
 # call the function avgDifFromMode on each of these sub-matrics
 # store the average differences in a list
@@ -87,7 +104,7 @@ avgDifSample <- function(x, progress)
 
 }
 
-# compute 3 vectors to guage uncertainty of the list x created by the function avgDifSample
+# compute 3 vectors to gauge uncertainty of the list x created by the function avgDifSample
 # the 1st vector is the means of the average differences
 # the 2nd vector is the sd's of the average differences
 # the 3rd vector is a number which is the sd of the means of the average differences
@@ -100,6 +117,23 @@ uncertainty <- function(x)
 
     return(valid)
 
+}
+
+# toy Monte Carlo study on the uncertainty in prediction
+toyMC = function(input, validSize, nExpt)
+{
+    TV = trainAndValidSets(input, validSize)
+    acc = vector()
+
+    for (i in 1:nExpt)
+    {
+        X1 = rfImpute(survived ~ ., TV[["train"]])
+        X2 = rfImpute(survived ~ ., TV[["valid"]])
+        p = predict(classifier(X1), X2)
+        acc[i] = mean(p == X2$survived)
+    }
+
+    return(acc)
 }
 
 # p = predictRF(train, test)

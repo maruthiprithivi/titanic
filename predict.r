@@ -128,27 +128,17 @@ uncertaintyTest = function(pred, nPoint)
     cbind(x, y)
 }
 
-# study on the uncertainty by validation
+# study the uncertainty from validation
 # split data set to training and validation
 # get classifier from training and predict on validation set
 # find standard deviation of 100 such predictions
 uncertaintyValid = function(input, validSize, nExpt)
 {
     TV = trainAndValidSets(input, validSize)
-    acc = vector()
+    pred = predMatrix(TV[["train"]], TV[["valid"]], nExpt)
+    acc = apply(pred, 1, function(r) { mean(r == TV[["valid"]]$survived) })
 
-    for (i in 1:nExpt)
-    {
-        X1 = rfImpute(survived ~ ., TV[["train"]])
-        X2 = rfImpute(survived ~ ., TV[["valid"]])
-        p = predict(classifier(X1), X2)
-        acc[i] = mean(p == X2$survived)
-    }
-
-    hist(acc, main = "", xlab = "accuracy")
-    title(paste("Validation accuracies (sd =", signif(sd(acc), 2), ")"))
-    abline(v = median(acc), col = "red")
-    abline(v = mean(acc), col = "blue")
+    hist(acc, main = "Validation accuracies", xlab = "accuracy")
 
     return(acc)
 }

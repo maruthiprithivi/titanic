@@ -87,11 +87,12 @@ refineData = function(x)
     x[which("SCParis" == x[y]), ][y] = "SCPARIS"
     x[z %in% c("SC", "SCA3", "SCA4", "SCAH", "SCAHBasle", "SCOW", "SOC", "SOP", "SOPP", "SP", "SWPP"), ][y] = "S"
     x[z %in% c("WC", "WEP"), ][y] = "W"
+    x[z %in% c("LINE", "LP"), ][y] = NA
 
     # turn certain columns into factors
-    x[y] = factor(x[ , y], levels = c("A", "C", "F", "LINE", "LP", "P", "S", "SCPARIS", "SOTON", "W"))
-    for (y in c("pclass", "sex", "embarked", "title", "cabinLetter"))
+    for (y in c("pclass", "sex", "embarked", "title", "ticketHeader", "cabinLetter"))
         x[y] = factor(x[ , y])
+
     # add order for these factors
     for (y in c("pclass", "cabinLetter"))
         x[y] = ordered(x[ , y])
@@ -100,6 +101,27 @@ refineData = function(x)
     x = x[!(names(x) %in% c("name", "ticket", "firstName"))]
 
     return(x)
+}
+
+# split a factor of characters which cannot be ordered into columns of binaries
+binarize <- function(x, column)
+{
+    y = x[column][[1]]
+    for (lev in levels(y))
+    {
+        x[paste(column, lev, sep = "")] = factor(as.integer(sapply(y,
+        function(z)
+        {
+            if (z %in% lev) z = 1
+            else if (is.na(z)) z = NA
+            else 0
+        })))
+    }
+
+    x[column] = NULL
+
+    return(x)
+
 }
 
 # c(10, 50, 292, 308, 547, 701, 782, 831, 856) Mrs

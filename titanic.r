@@ -6,13 +6,13 @@ formatData = function(fileName)
     input = refineData(rawData(sub(".csv", "", fileName)))
 
     # drop unnecessary columns
-    input$lastName = NULL
+    # input$lastName = NULL
     # input$title = NULL
-    input$ticketHeader = NULL
+    # input$ticketHeader = NULL
     # input$ticketNumber = NULL
     # input$cabinLetter = NULL
-    input$cabinNumber = NULL
-    input$cabin = NULL
+    # input$cabinNumber = NULL
+    # input$cabin = NULL
 
     return(input)
 }

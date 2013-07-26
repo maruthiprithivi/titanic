@@ -124,107 +124,120 @@ binarize <- function(x, column)
 
 }
 
-# reconstruct family relationships
-recoFamily = function(train, test)
+# reconstruct a family relationship
+recoFamily = function(f)
+{
+    nMember = nrow(f)
+
+    if (any(nMember != f$famSize)) # inconsistent family size
+    {
+        f$invalid = TRUE
+    }
+    else # family size agrees with number of members
+    {
+        if (any(f$parch > 0)) # parents and children
+        {
+            mother = which(f$title == "Mrs")
+            youngs = which(f$title %in% c("Master", "Miss"))
+            hasMom = length(mother) > 0
+            nYoung = length(youngs) # exclude children who are Mr
+            childs = which(         # indices of all children
+                if (hasMom)
+                {
+                    f[mother, "parch"] - 1 == f$sibsp
+                }
+                else if (nYoung > 0)
+                {
+                    f[youngs[1], "sibsp"] == f$sibsp
+                }
+                else # only father and sons
+                {
+                    1 == f$parch # 1 parent only (father)
+                })
+            parent = -childs #indices of parents
+
+            # if no. of parents = no. of children = 1 or 2,
+            # then length(childs) = number of members in family
+            # need to correct for this case
+            if (length(childs) == nMember)
+            {
+                father = NULL
+                oldSon = NULL
+
+                if (2 == nYoung ||           # 2 parents + 2 children
+                    (!hasMom && nYoung > 0)) # 1 father + 1 child
+                {
+                    father = which(f$title %in% c("Mr", "Rev"))
+                }
+                else if (hasMom && 0 == nYoung) # 1 mother + 1 son
+                {
+                    oldSon = which(f$title == "Mr")
+                }
+                else if (hasMom + nYoung == 0) # 1 father + 1 son, both Mr
+                {
+                    if (!any(is.na(f$age)))
+                    {
+                        oldSon = which.min(f$age)
+                        father = -oldSon
+                    }
+                    else # there is missing age values
+                        print(paste("Dad/son ambiguity in family", f$lastName))
+                }
+
+                childs = c(youngs, oldSon)
+                parent = c(mother, father)
+            }
+
+            f[childs, "child" ] = 1
+            f[childs, "parent"] = 0
+            f[parent, "child" ] = 0
+            f[parent, "parent"] = 1
+        }
+        else # brothers/sisters or single
+        {
+            f$child  = 0
+            f$parent = 0
+        }
+
+        # add info of other members' survival
+        x = f$survived == 1
+        nAlive = sum( x, na.rm = T)
+        nDrown = sum(!x, na.rm = T)
+        f$othersAlive = nAlive - (!is.na(x) &  x)
+        f$othersDrown = nDrown - (!is.na(x) & !x)
+    }
+
+    return(f)
+}
+
+# reconstruct family relationships in the combined data set of train + test
+recoFamilies = function(train, test)
 {
     test$survived = factor(NA, c(0, 1))
     combined = rbind(train, test)
     combined$famSize = combined$sibsp + combined$parch + 1
-    combined$famName = paste(combined$lastName, combined$ticketNumber)
-    combined$invalid = factor(0, c(0, 1))
-    families = split(combined, combined$famName)
+    combined$invalid = FALSE
+    combined$child   = factor(NA, c(0, 1))
+    combined$parent  = factor(NA, c(0, 1))
+    combined$othersAlive = NA
+    combined$othersDrown = NA
 
-    for (f in families)
+    # first find families by surname
+    for (f in split(combined, combined$lastName))
     {
-        nMember = nrow(f)
-        indices = rownames(f) # original row numbers in combined
-
-        if (any(nMember != f$famSize)) # inconsistent family size
-        {
-            combined[indices, "invalid"] = 1
-        }
-        else # family size agrees with number of members
-        {
-            if (any(f$parch > 0)) # parents and children
-            {
-                mother = f[f$title == "Mrs", ]
-                childs = f[f$title %in% c("Master", "Miss"), ]
-                hasMom = nrow(mother) > 0
-                nChild = nrow(childs)
-                iChild = which(
-                    if (hasMom)
-                    {
-                        mother$parch - 1 == f$sibsp
-                    }
-                    else if (nChild > 0)
-                    {
-                        childs$sibsp[1] == f$sibsp
-                    }
-                    else # only father and sons
-                    {
-                        1 == f$parch # 1 parent only (father)
-                    })
-
-                # if no. of parents = no. of children = 1 or 2,
-                # then length(iChild) = nMember
-                if (length(iChild) < nMember) # normal case
-                {
-                    combined[indices[ iChild], "child" ] = 1
-                    combined[indices[ iChild], "parent"] = 0
-                    combined[indices[-iChild], "child" ] = 0
-                    combined[indices[-iChild], "parent"] = 1
-                }
-                else # special case for length(iChild) = nMember
-                {
-                    if (hasMom) 
-                    {
-                        combined[rownames(mother), "child" ] = 0
-                        combined[rownames(mother), "parent"] = 1
-                    }
-
-                    if (nChild > 0)
-                    {
-                        combined[rownames(childs), "child" ] = 1
-                        combined[rownames(childs), "parent"] = 0
-                    }
-
-                    if (2 == nChild ||           # 2 parents + 2 children
-                        (!hasMom && nChild > 0)) # 1 father + 1 child
-                    {
-                        father = rownames(f[f$title == "Mr", ])
-
-                        combined[father, "child" ] = 0
-                        combined[father, "parent"] = 1
-                    }
-
-                    if (hasMom && 0 == nChild) # 1 mother + 1 son
-                    {
-                        son = rownames(f[f$title == "Mr", ])
-
-                        combined[son, "child" ] = 1
-                        combined[son, "parent"] = 0
-                    }
-                }
-            }
-            else # brothers/sisters or single
-            {
-                combined[indices, "child" ] = 0
-                combined[indices, "parent"] = 0
-            }
-
-            # add info of other members' survival
-            x = f$survived == 1
-            nAlive = sum( x, na.rm = T)
-            nDrown = sum(!x, na.rm = T)
-            combined[indices, "othersAlive"] = nAlive - (!is.na(x) &  x)
-            combined[indices, "othersDrown"] = nDrown - (!is.na(x) & !x)
-        }
+        combined[rownames(f), ] = recoFamily(f)
     }
 
-    combined$child   = as.factor(combined$child)
-    combined$parent  = as.factor(combined$parent)
+    invalids = combined[combined$invalid, ]
+    invalids$invalid = FALSE # reset invalid flag
+
+    # find remaining families by ticket number
+    for (f in split(invalids, invalids$ticketNumber))
+    {
+        combined[rownames(f), ] = recoFamily(f)
+    }
+
     combined$famSize = NULL
-    combined$famName = NULL
 
     write.csv(combined, "data/combined.csv", na = "")
 

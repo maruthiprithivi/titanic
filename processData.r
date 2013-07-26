@@ -73,8 +73,8 @@ refineData = function(x)
     royal = c("Don", "Dona", "Jonkheer", "Lady", "Sir", "the Countess")
     x$title[x$title %in% royal] = "Royal"
 
-    # change unrealistic cabin letter to NA
-    x$cabinLetter["T" == x$cabinLetter] = NA
+    # change boat deck cabin letter T to A; only 1 such case
+    x$cabinLetter["T" == x$cabinLetter] = "A"
 
     # combine certain ticketHeaders
     y = "ticketHeader"

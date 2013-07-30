@@ -38,13 +38,20 @@ plotError = function(err, name)
     savePlot(paste("figures/min error", name), "png")
 }
 
-# set.seed(0)
-# X = rfImpute(survived ~ ., train) # fill missing values
-# err = lapply(2:ncol(X) - 1, function(d) { stopEarly(X, d) })
-# save(err, file = "data/OOBerrors.RData")
-load("data/OOBerrors.RData")
-plotError(err, "index")
-plotError(err, "value")
-windows()
-boxplot(lapply(1:length(err), function(d) { err[[d]][, "value"] }), xlab = "d")
-savePlot("figures/validation curve", "png")
+validate = function(train, errFile = "")
+{
+    if ("" == errFile)
+    {
+        set.seed(0)
+        X = rfImpute(survived ~ ., train) # fill missing values
+        err = lapply(2:ncol(X) - 1, function(d) { stopEarly(X, d) })
+        save(err, file = "data/OOBerrors.RData")
+    }
+
+    load("data/OOBerrors.RData")
+    plotError(err, "index")
+    plotError(err, "value")
+    windows()
+    boxplot(lapply(1:length(err), function(d) { err[[d]][, "value"] }), xlab = "d")
+    savePlot("figures/validation curve", "png")
+}

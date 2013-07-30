@@ -8,11 +8,11 @@ rawData = function(fileName)
     path = file.path(getwd(), paste(fileName, ".csv", sep = ""))
     x = read.csv(path, stringsAsFactors = F)
 
-    # split name into lastName, title and firstName which are added to data frame as columns
+    # split name into lastName, title and otherName which are added to data frame as columns
     nameSplit = sapply(x["name"], function(y) {strsplit(y, "[,.] | [ ]")})
     x["lastName"] = sapply(nameSplit, function(y) {y[1]})
     x["title"] = sapply(nameSplit, function(y) {y[2]})
-    x["firstName"] = sapply(nameSplit, function(y) {y[3]})
+    x["otherName"] = sapply(nameSplit, function(y) {y[3]})
 
     # split ticket into ticketHeader (alpha-numeric) and ticketNumber which are added to data frame as columns
     ticketSplit = sapply(x["ticket"], function(y) {strsplit(gsub("[./]", "", y), " ")})
@@ -104,7 +104,7 @@ refineData = function(x)
         x[y] = ordered(x[ , y])
 
     # remove unnecessary columns
-    x = x[!(names(x) %in% c("name", "ticket", "firstName"))]
+    x = x[!(names(x) %in% c("name", "ticket", "otherName"))]
 
     return(x)
 }
@@ -120,6 +120,7 @@ binarize <- function(x, column)
         {
             if (z %in% lev) z = 1
             else if (is.na(z)) z = NA
+#            else if (is.na(z)) z = 2
             else 0
         })))
     }

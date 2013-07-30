@@ -76,6 +76,12 @@ refineData = function(x)
     # change boat deck cabin letter T to A; only 1 such case
     x$cabinLetter["T" == x$cabinLetter] = "A"
 
+    # correct cabin letters for "F Gxx"; should be "F" instead of "G"
+    x[grep("F G??", x$cabin), "cabinLetter"] = "F"
+
+    # replace unknown LINE ticket numbers by 0; only 4 cases
+    x[x$ticket == "LINE", "ticketNumber"] = 0
+
     # combine certain ticketHeaders
     y = "ticketHeader"
     z = x[y][[1]]
@@ -236,8 +242,6 @@ recoFamilies = function(train, test)
     {
         combined[rownames(f), ] = recoFamily(f)
     }
-
-    combined$famSize = NULL
 
     write.csv(combined, "data/combined.csv", na = "")
 

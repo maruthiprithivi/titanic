@@ -17,6 +17,20 @@ formatData = function(fileName)
     return(input)
 }
 
+recoData = function(fileName)
+{
+    input = read.csv(fileName)
+    input[names(input) %in% "survived"] = factor(input$survived)
+    input$pclass = factor(input$pclass, ordered = T)
+    input$cabinLetter = ordered(input$cabinLetter)
+
+    # drop unnecessary columns
+    cols = c("sibsp", "parch", "embarked", "ticketHeader", "cabinNumber", "child", "parent")
+    input = input[!(names(input) %in% cols)]
+
+    return(input)
+}
+
 # divide a data set to training and validation of given size
 trainAndValidSets = function(X, validSize = nrow(X) / 3)
 {
@@ -38,8 +52,10 @@ convergence = function(X)
     lines(RF$test[["err.rate"]][, "Test"])
 }
 
-train = formatData("train.csv")
-test = formatData("test.csv")
+# train = formatData("train.csv")
+# test = formatData("test.csv")
+train = recoData("data/recoTrain.csv")
+test = recoData("data/recoTest.csv")
 
 # X = rfImpute(survived ~ ., train) # fill missing values
 # RF = randomForest(survived ~ ., X, ntree = 8000)

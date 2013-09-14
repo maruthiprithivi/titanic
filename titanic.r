@@ -6,13 +6,8 @@ formatData = function(fileName)
     input = refineData(rawData(sub(".csv", "", fileName)))
 
     # drop unnecessary columns
-    # input$lastName = NULL
-    # input$title = NULL
-    # input$ticketHeader = NULL
-    # input$ticketNumber = NULL
-    # input$cabinLetter = NULL
-    # input$cabinNumber = NULL
-    # input$cabin = NULL
+    cols = c("lastName", "ticketHeader", "cabinLetter", "cabinNumber", "cabin")
+    input = input[!(names(input) %in% cols)]
 
     return(input)
 }
@@ -21,11 +16,13 @@ recoData = function(fileName)
 {
     input = read.csv(fileName)
     input[names(input) %in% "survived"] = factor(input$survived)
+    input$child = factor(input$child)
+    input$parent = factor(input$parent)
     input$pclass = factor(input$pclass, ordered = T)
     input$cabinLetter = ordered(input$cabinLetter)
 
     # drop unnecessary columns
-    cols = c("sibsp", "parch", "embarked", "ticketHeader", "cabinNumber", "child", "parent")
+    cols = c("ticketHeader", "cabinNumber", "cabinLetter", "child", "parent")
     input = input[!(names(input) %in% cols)]
 
     return(input)

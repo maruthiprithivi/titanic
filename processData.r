@@ -128,7 +128,14 @@ binarize <- function(x, column)
     x[column] = NULL
 
     return(x)
+}
 
+# binarize all categorical columns (factors with no order)
+expand = function(input, columns)
+{
+    for (column in columns) input = binarize(input, column)
+
+    return(input)
 }
 
 # reconstruct a family relationship

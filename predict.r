@@ -26,14 +26,15 @@ classifier = function(X, bestT = 2000, best.d = 4)
 # sum probabilities over the class assumptions to give a weight for
 # survived = 0 and for survived = 1
 # prediction is given by the value of survived with the max weight
-predictRF = function(train, test, ...)
+# give a list of categories to expand such columns into binary factors
+predictRF = function(train, test, categories = NULL, ...)
 {
     X = fillAll(train)
-    RF = classifier(X, ...)
+    RF = classifier(expand(X, categories), ...)
     print(RF)
     varImpPlot(RF)
-    p0 = predict(RF, fillByAssumption(X, test, 0), "prob")
-    p1 = predict(RF, fillByAssumption(X, test, 1), "prob")
+    p0 = predict(RF, expand(fillByAssumption(X, test, 0), categories), "prob")
+    p1 = predict(RF, expand(fillByAssumption(X, test, 1), categories), "prob")
 
     as.integer(levels(X$survived)[max.col(p0 + p1)])
 }

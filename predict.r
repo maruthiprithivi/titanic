@@ -28,8 +28,10 @@ classifier = function(X, bestT = 2000, best.d = 4)
 # prediction is given by the value of survived with the max weight
 predictRF = function(train, test, ...)
 {
-    X = rfImpute(survived ~ ., train)
+    X = fillAll(train)
     RF = classifier(X, ...)
+    print(RF)
+    varImpPlot(RF)
     p0 = predict(RF, fillByAssumption(X, test, 0), "prob")
     p1 = predict(RF, fillByAssumption(X, test, 1), "prob")
 

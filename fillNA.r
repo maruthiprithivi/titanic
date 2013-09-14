@@ -1,13 +1,25 @@
 ## Methods to fill missing values (NA) in data sets.
 
-# fill test missing values by regression
-fillByRegression = function(X, test, column)
+# fill missing age values using title only
+fillAge = function(input)
 {
-	regRF = randomForest(X[, column] ~ ., X, na.action = na.omit)
-	na.i = which(is.na(test[column]))
-	rows = test[na.i, ]
-	rows[column] = NULL
-	test[na.i, column] = predict(regRF, rows)
+    input$age = rfImpute(survived ~ age + title, input)$age
+
+    return(input)
+}
+
+# fill missing fare values using pclass only
+fillFare = function(input)
+{
+    input$fare = rfImpute(survived ~ fare + pclass, input)$fare
+
+    return(input)
+}
+
+fillAll = function(input)
+{
+    input = fillAge(input) # fill age first to avoid using all variables
+    input = rfImpute(survived ~ ., input) # fill remaining NA's
 }
 
 # fill test missing values by assuming one class and
@@ -15,7 +27,7 @@ fillByRegression = function(X, test, column)
 fillByAssumption = function(X, test, value)
 {
     test$survived = factor(value, c(0, 1))
-    test = rfImpute(survived ~ ., rbind(test, X))[1:nrow(test), ]
+    test = fillAll(rbind(test, X))[1:nrow(test), ]
     test$survived = NULL
 
     return(test)
